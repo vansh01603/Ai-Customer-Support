@@ -38,14 +38,14 @@ The application allows customers to register and log in securely, view and place
 * Express 5
 * MongoDB
 * Mongoose
-* JWT (jsonwebtoken)
-* bcryptjs
+* JWT (`jsonwebtoken`)
+* `bcryptjs`
 * CORS
-* Google Gemini via @google/genai
+* Google Gemini via `@google/genai`
 
 ## Project Structure
 
-
+```text
 Ai-customer-support/
 │
 ├── Client/
@@ -92,9 +92,11 @@ Ai-customer-support/
 │   └── server.js
 │
 └── README.md
-
+```
 
 ## Application Flow
+
+```text
 User
  │
  ├── Register
@@ -117,19 +119,21 @@ User
               ├── Optional Order ID
               ├── Gemini processes request
               └── Conversation saved
-
+```
 
 ## Authentication
 
 Registration creates a new user after checking whether the email already exists.
 
-Passwords are never stored as plain text. They are hashed using bcryptjs.
+Passwords are never stored as plain text. They are hashed using `bcryptjs`.
 
 After successful login, the backend generates a JWT containing the authenticated user's ID.
 
 Protected endpoints require:
 
+```text
 Authorization: Bearer <token>
+```
 
 The authentication middleware verifies the token and attaches the user ID to the request.
 
@@ -176,7 +180,7 @@ Chat history is retrieved for the authenticated user and sorted chronologically.
 
 ## AI Integration
 
-Google Gemini is used as the AI provider through the @google/genai SDK.
+Google Gemini is used as the AI provider through the `@google/genai` SDK.
 
 The backend constructs a prompt containing:
 
@@ -186,12 +190,13 @@ The backend constructs a prompt containing:
 
 Example order context:
 
+```text
 Order ID: ORD1001
 Status: pending
 Total Amount: 499
 Estimated Delivery: ...
 Items: Wireless Mouse x1
-
+```
 
 The AI is instructed to use this information when answering order-related questions.
 
@@ -199,62 +204,68 @@ If no matching order information is available, the assistant is instructed not t
 
 ## API Documentation
 
-The backend runs under /api.
+The backend runs under `/api`.
 
 ### Authentication
 
-| Method | Endpoint            | Body                       | Description                       |
-| ------ | ------------------- | -------------------------- | ---------------------------------- |
-| POST   | /api/auth/register  | { name, email, password }  | Register a new user                |
-| POST   | /api/auth/login     | { email, password }        | Authenticate user and return JWT   |
+| Method | Endpoint             | Body                        | Description                      |
+| ------ | -------------------- | --------------------------- | -------------------------------- |
+| POST   | `/api/auth/register` | `{ name, email, password }` | Register a new user              |
+| POST   | `/api/auth/login`    | `{ email, password }`       | Authenticate user and return JWT |
 
 ### Orders
 
 All order endpoints require authentication.
 
-| Method | Endpoint              | Body                  | Description                          |
-| ------ | --------------------- | ---------------------- | ------------------------------------ |
-| GET    | /api/orders/catalog   | —                      | Get available products               |
-| POST   | /api/orders           | { itemId, quantity }   | Create an order                      |
-| GET    | /api/orders           | —                      | Get the authenticated user's orders  |
-| GET    | /api/orders/:orderId  | —                      | Get one authenticated user's order   |
+| Method | Endpoint               | Body                   | Description                         |
+| ------ | ---------------------- | ---------------------- | ----------------------------------- |
+| GET    | `/api/orders/catalog`  | —                      | Get available products              |
+| POST   | `/api/orders`          | `{ itemId, quantity }` | Create an order                     |
+| GET    | `/api/orders`          | —                      | Get the authenticated user's orders |
+| GET    | `/api/orders/:orderId` | —                      | Get one authenticated user's order  |
 
 ### Chat
 
 All chat endpoints require authentication.
 
-| Method | Endpoint           | Body                   | Description                                |
-| ------ | ------------------ | ---------------------- | -------------------------------------------- |
-| POST   | /api/chat          | { message, orderId? }  | Send a message to the AI assistant           |
-| GET    | /api/chat/history  | —                      | Get the authenticated user's chat history    |
+| Method | Endpoint            | Body                    | Description                               |
+| ------ | ------------------- | ----------------------- | ----------------------------------------- |
+| POST   | `/api/chat`         | `{ message, orderId? }` | Send a message to the AI assistant        |
+| GET    | `/api/chat/history` | —                       | Get the authenticated user's chat history |
 
 ## Environment Variables
 
 ### Backend
 
-Create server/.env:
+Create `server/.env`:
 
-env
+```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 GEMINI_API_KEY=your_gemini_api_key
 CLIENT_URL=http://localhost:5173
+```
 
 See:
-server/.env.example
 
+```text
+server/.env.example
+```
 
 ### Frontend
 
-Create Client/.env:
+Create `Client/.env`:
 
-env
+```env
 VITE_API_URL=http://localhost:5000/api
+```
 
 See:
-Client/.env.example
 
+```text
+Client/.env.example
+```
 
 Environment files containing secrets are excluded from Git.
 
@@ -262,59 +273,78 @@ Environment files containing secrets are excluded from Git.
 
 ### 1. Clone the repository
 
+```bash
 git clone <repository-url>
 cd Ai-customer-support
-
+```
 
 ### 2. Install backend dependencies
+
+```bash
 cd server
 npm install
+```
 
-Create .env using .env.example and provide the required values.
+Create `.env` using `.env.example` and provide the required values.
 
 Start the backend:
 
+```bash
 npm start
+```
 
 The backend runs on:
 
+```text
 http://localhost:5000
+```
 
 ### 3. Install frontend dependencies
 
 Open another terminal:
 
+```bash
 cd Client
 npm install
+```
 
-Create .env:
+Create `.env`:
 
+```env
 VITE_API_URL=http://localhost:5000/api
+```
 
 Start the frontend:
 
+```bash
 npm run dev
-
+```
 
 The frontend runs on Vite's development server, normally:
 
+```text
 http://localhost:5173
-
+```
 
 ## Frontend Configuration
 
 API requests are centralized in:
 
+```text
 Client/src/api/axios.js
+```
 
 The application reads:
 
+```text
 VITE_API_URL
-
+```
 
 and falls back to:
 
+```text
 http://localhost:5000/api
+```
 
 for local development.
 
@@ -324,14 +354,14 @@ For deployment, the production frontend API URL can be supplied through the host
 
 The API handles common application errors including:
 
-* Duplicate user registration → 400
-* Invalid login credentials → 401
-* Missing/invalid authentication token → 401
-* Missing chat message → 400
-* Invalid product selection → 400
-* Order not found → 404
-* AI service failure → 500
-* Database/server failures → 500
+* Duplicate user registration → `400`
+* Invalid login credentials → `401`
+* Missing/invalid authentication token → `401`
+* Missing chat message → `400`
+* Invalid product selection → `400`
+* Order not found → `404`
+* AI service failure → `500`
+* Database/server failures → `500`
 
 AI failures are caught by the chat controller so that an unsuccessful AI request does not create a broken conversation record.
 
@@ -341,8 +371,8 @@ AI failures are caught by the chat controller so that an unsuccessful AI request
 * JWT authentication protects private routes.
 * Users can only access their own orders and conversations.
 * API keys and database credentials are stored in environment variables.
-* .env files are excluded from version control.
-* .env.example files contain only placeholder values.
+* `.env` files are excluded from version control.
+* `.env.example` files contain only placeholder values.
 
 ## Deployment
 
@@ -353,22 +383,26 @@ The application can be deployed as two services:
 The React/Vite frontend can be deployed using Vercel or another static hosting provider.
 
 Set:
-VITE_API_URL=https://<deployed-backend-url>/api
 
+```env
+VITE_API_URL=https://<deployed-backend-url>/api
+```
 
 ### Backend
 
 The Express backend can be deployed using Render or another Node.js hosting provider.
 
 Required backend environment variables:
+
+```text
 PORT
 MONGODB_URI
 JWT_SECRET
 GEMINI_API_KEY
 CLIENT_URL
+```
 
-
-The backend must be deployed before configuring the frontend's production VITE_API_URL.
+The backend must be deployed before configuring the frontend's production `VITE_API_URL`.
 
 ## Known Limitations
 
